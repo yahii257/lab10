@@ -1,0 +1,85 @@
+Check 2
+±µ¦¬ºÝ
+ #include <IRremote.h>
+
+const int buttonPin = 6;
+int buttonState = 0;
+
+const int irrReceiverPin=2;
+
+IRrecv irrecv(irrReceiverPin);
+decode_results results;
+IRsend irsend;
+
+void setup() 
+{
+  Serial.begin(9600);
+  pinMode(buttonPin,INPUT);
+  irrecv.enableIRIn();
+}
+ 
+void loop() 
+{
+ 
+  buttonState = digitalRead(buttonPin);
+
+  if(buttonState==HIGH)
+  {
+    irsend.sendNEC(0x4FB48B7,32);
+  }
+  if(irrecv.decode(&results))
+  {
+    Serial.print("irCode:");
+    Serial.print(results.value,HEX);
+    Serial.print("  bits:");
+    Serial.print(results.bits);
+    Serial.println();
+    irrecv.resume();
+     }
+ 
+}
+
+µo®gºÝ
+#include <IRremote.h>
+
+IRsend irsend;
+
+void setup()
+{
+  Serial.begin(9600);
+}
+
+void loop() {
+  int d;
+  if( (d = Serial.read()) != -1) { 
+    unsigned long v = 0x0;
+    switch(d){ 
+      case '1':
+        v = 0x77E14050;
+      break;
+      case '2':
+        v = 0x77E12050;
+      break;
+      case '3':
+        v = 0x77E1D050;
+      break;
+      case '4':
+        v = 0x77E1B050;
+      break;
+      case '5':
+        v = 0x77E1E050;
+      break;
+      case '6':
+        v = 0x77E11050;
+      break;
+    }
+    
+    if(v != 0x0){
+      Serial.print("read ");
+      Serial.print(d);
+      Serial.print(", IR send ");
+      Serial.println(v, HEX);
+      irsend.sendNEC(v, 32); 
+    }
+  }
+}
